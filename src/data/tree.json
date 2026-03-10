@@ -8,27 +8,157 @@
       "branches": {
         "top of knee": {
           "id": "node_top_of_knee",
-          "attribute": "time_of_day",
+          "attribute": "pain_side",
           "branches": {
-            "morning": {
-              "id": "node_morning",
-              "exercises": ["ex_001"]
+            "left": {
+              "id": "node_left_running_top",
+              "attribute": "pain_description",
+              "branches": {
+                "sharp": {
+                  "id": "node_lrt_sharp",
+                  "exercises": [
+                    "ex_001",
+                    "ex_012"
+                  ]
+                },
+                "dull ache": {
+                  "id": "node_lrt_dull",
+                  "exercises": [
+                    "ex_001",
+                    "ex_004"
+                  ]
+                },
+                "*": {
+                  "id": "node_lrt_any",
+                  "exercises": [
+                    "ex_001"
+                  ]
+                }
+              }
             },
-            "*": {
-              "id": "node_wildcard",
-              "exercises": ["ex_001", "ex_004"]
+            "right": {
+              "id": "node_right_running_top",
+              "exercises": [
+                "ex_001",
+                "ex_012"
+              ]
+            },
+            "both": {
+              "id": "node_both_running_top",
+              "exercises": [
+                "ex_001",
+                "ex_004",
+                "ex_012"
+              ]
             }
           }
         },
         "outside of knee": {
-          "id": "node_outside_of_knee",
-          "exercises": ["ex_002"]
+          "id": "node_itb_root",
+          "attribute": "pain_description",
+          "branches": {
+            "sharp": {
+              "id": "node_itb_sharp",
+              "exercises": [
+                "ex_002",
+                "ex_010"
+              ]
+            },
+            "stiffness": {
+              "id": "node_itb_stiff",
+              "exercises": [
+                "ex_002",
+                "ex_015"
+              ]
+            },
+            "*": {
+              "id": "node_itb_any",
+              "exercises": [
+                "ex_002",
+                "ex_007"
+              ]
+            }
+          }
+        },
+        "below kneecap": {
+          "id": "node_patellar_root",
+          "exercises": [
+            "ex_005",
+            "ex_008",
+            "ex_014"
+          ]
         }
       }
     },
     "walking upstairs": {
-      "id": "node_walking_upstairs",
-      "exercises": ["ex_003"]
+      "id": "node_stair_root",
+      "attribute": "pain_description",
+      "branches": {
+        "clicking": {
+          "id": "node_stair_clicking",
+          "exercises": [
+            "ex_003",
+            "ex_008"
+          ]
+        },
+        "sharp": {
+          "id": "node_stair_sharp",
+          "exercises": [
+            "ex_005",
+            "ex_011"
+          ]
+        },
+        "*": {
+          "id": "node_stair_any",
+          "exercises": [
+            "ex_003"
+          ]
+        }
+      }
+    },
+    "jumping": {
+      "id": "node_jumping_root",
+      "attribute": "pain_location",
+      "branches": {
+        "below kneecap": {
+          "id": "node_jumper_knee",
+          "exercises": [
+            "ex_005",
+            "ex_009"
+          ]
+        },
+        "*": {
+          "id": "node_jump_any",
+          "exercises": [
+            "ex_001",
+            "ex_006"
+          ]
+        }
+      }
+    },
+    "squatting": {
+      "id": "node_squat_root",
+      "exercises": [
+        "ex_009",
+        "ex_003",
+        "ex_014"
+      ]
+    },
+    "sitting for a long time": {
+      "id": "node_sitting_root",
+      "exercises": [
+        "ex_008",
+        "ex_001",
+        "ex_012"
+      ]
+    },
+    "*": {
+      "id": "node_root_wildcard",
+      "exercises": [
+        "ex_001",
+        "ex_008",
+        "ex_019"
+      ]
     }
   }
 }

@@ -9,7 +9,7 @@ export function traverseTree(node, fields, logger) {
 
     if (providedValue === undefined || providedValue === null) {
         logger.info("traverseTree", "Missing info for attribute", { attribute: attr });
-        return { status: 'missing_info', missingAttribute: attr };
+        return { status: 'missing_info', missingAttributes: [attr] };
     }
 
     if (node.branches) {
@@ -18,7 +18,9 @@ export function traverseTree(node, fields, logger) {
             return traverseTree(node.branches[providedValue], fields, logger);
         } else if (node.branches["*"]) {
             logger.info("traverseTree", "Wildcard branch selected", { attribute: attr, value: providedValue });
-            return traverseTree(node.branches["*"], fields, logger);
+            const result = traverseTree(node.branches["*"], fields, logger);
+            result.matchedWildcard = true;
+            return result;
         }
     }
 

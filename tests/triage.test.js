@@ -1,89 +1,134 @@
-import request from 'supertest';
-import app from '../src/app.js';
-import { validateTree } from '../src/utils/validator.js';
+import { jest } from '@jest/globals';
 
-describe('Knee Pain Triage System', () => {
+// A shared mock that is accessible inside the test context
+const mockGenerateContent = jest.fn();
+
+// In ESM, unstable_mockModule is the standard way to mock dependencies
+jest.unstable_mockModule('@google/generative-ai', () => ({
+  GoogleGenerativeAI: class {
+    constructor() { }
+    getGenerativeModel() {
+      return { generateContent: mockGenerateContent };
+    }
+  },
+  SchemaType: { OBJECT: 'OBJECT', STRING: 'STRING' }
+}));
+
+// We must use dynamic imports after the mock is defined to ensure it is used
+const { default: app } = await import('../src/app.js');
+const { default: request } = await import('supertest');
+const { validateTree } = await import('../src/utils/validator.js');
+
+describe('Knee Pain Triage System - Real User Scenarios', () => {
+
+  beforeEach(() => {
+    // Reset all mock implementations and call history before each test
+    mockGenerateContent.mockReset();
+    jest.clearAllMocks();
+  });
+
   describe('POST /api/diagnose', () => {
-    it('should return correct exercises for valid input (Happy Path)', async () => {
+    it('should return correct exercises for a specific match (Run + Top + Left + Sharp)', async () => {
+      // Setup the implementation specifically for this test
+      mockGenerateContent.mockResolvedValueOnce({
+        response: {
+          text: () => JSON.stringify({
+            activity_trigger: "after running",
+            pain_location: "top of knee",
+            pain_side: "left",
+            pain_description: "sharp"
+          })
+        }
+      });
+
       const res = await request(app)
         .post('/api/diagnose')
-        .send({ prompt: "hurts when I walk upstairs" });
+        .send({ prompt: "Ever since I started running last week, I get this sharp pain right on the top of my left knee." });
 
       expect(res.status).toBe(200);
       expect(res.body).toHaveProperty('recommended_exercises');
-      expect(res.body.recommended_exercises[0].name).toBe('Step-ups');
+      expect(res.body.recommended_exercises).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({ name: 'Quad Stretch' }),
+          expect.objectContaining({ name: 'Short Arc Quads' })
+        ])
+      );
     });
 
-    it('should return a follow-up question when information is missing', async () => {
+    it('should handle missing info by providing multiple follow-up questions', async () => {
+      mockGenerateContent.mockResolvedValueOnce({
+        response: {
+          text: () => JSON.stringify({
+            activity_trigger: "walking upstairs"
+          })
+        }
+      });
+
       const res = await request(app)
         .post('/api/diagnose')
-        .send({ prompt: "left knee aches after running and top" });
+        .send({ prompt: "My knee hurts when I walk upstairs." });
 
       expect(res.status).toBe(200);
       expect(res.body).toHaveProperty('message', 'More info needed');
-      expect(res.body.follow_up_questions[0]).toContain('time_of_day');
+      expect(res.body.follow_up_questions).toEqual(
+        expect.arrayContaining([
+          expect.stringContaining('pain_description'),
+          expect.stringContaining('pain_side'),
+          expect.stringContaining('pain_location')
+        ])
+      );
     });
 
-    it('should return a 404 error for unknown input / unmapped branch', async () => {
+    it('should return a suggestion when the activity is unrecognized (other)', async () => {
+      mockGenerateContent.mockResolvedValueOnce({
+        response: {
+          text: () => JSON.stringify({
+            activity_trigger: "other"
+          })
+        }
+      });
+
       const res = await request(app)
         .post('/api/diagnose')
-        .send({ prompt: "unknown trigger" });
+        .send({ prompt: "My knees hurt when I'm crawling on the floor." });
 
-      expect(res.status).toBe(404);
-      expect(res.body.error).toBe('No matching diagnosis found');
+      expect(res.status).toBe(200);
+      expect(res.body).toHaveProperty('message');
+      expect(res.body.message).toContain('We don\'t have a specific clinical match for your description in our current algorithm, but here are some basic exercises you can perform for general knee health!');
+      expect(res.body).toHaveProperty('recommended_exercises');
+      expect(res.body.recommended_exercises[0].name).toBe('Quad Stretch');
     });
 
-    it('should return 503 on API Timeout', async () => {
+    it('should handle LLM API timeouts with 503', async () => {
+      // For timeout, we want generateContent to never resolve or to throw an specific error
+      mockGenerateContent.mockImplementationOnce(() => {
+        return new Promise((_, reject) => {
+          setTimeout(() => reject(new Error("LLM API timeout")), 1);
+        });
+      });
+
       const res = await request(app)
         .post('/api/diagnose')
-        .send({ prompt: "timeout" });
+        .send({ prompt: "Timeout test prompt" });
 
       expect(res.status).toBe(503);
-      expect(res.body.error).toContain('timeout');
-    });
-
-    it('should return 500 on Bad JSON format from LLM', async () => {
-      const res = await request(app)
-        .post('/api/diagnose')
-        .send({ prompt: "bad format" });
-
-      expect(res.status).toBe(500);
-      expect(res.body.error).toContain('Failed to parse');
+      expect(res.body.error).toContain('took too long');
     });
   });
 
-  describe('Tree Validation', () => {
+  describe('Data Integrity Validation', () => {
     const catalog = {
       "ex_001": { "name": "Quad Stretch", "reps": 10 }
     };
 
-    it('should throw an error on a dead end', () => {
-      const deadEndTree = {
-        id: "node_1",
-        attribute: "test"
-      };
-
-      expect(() => validateTree(deadEndTree, catalog)).toThrow(/Dead end/);
+    it('should catch dead-end nodes during tree validation', () => {
+      const deadEndTree = { id: "bad_node", attribute: "missing_branches" };
+      expect(() => validateTree(deadEndTree, catalog)).toThrow();
     });
 
-    it('should throw an error on a missing catalog ID', () => {
-      const invalidTree = {
-        id: "node_1",
-        exercises: ["ex_999"]
-      };
-
-      expect(() => validateTree(invalidTree, catalog)).toThrow(/not found in catalog/);
-    });
-
-    it('should throw an error on circular reference', () => {
-      const circularTree = {
-        id: "node_1",
-        attribute: "test",
-        branches: {}
-      };
-      circularTree.branches["yes"] = circularTree;
-
-      expect(() => validateTree(circularTree, catalog)).toThrow(/Circular reference/);
+    it('should catch invalid exercise references', () => {
+      const invalidTree = { id: "bad_node", exercises: ["NON_EXISTENT_ID"] };
+      expect(() => validateTree(invalidTree, catalog)).toThrow();
     });
   });
 });

@@ -1,47 +1,87 @@
-# Knee Pain Triage API
+# Knee Pain Triage & Recovery API
 
-A production-ready Express.js API (ESM) that uses a (mocked) LLM to extract structured data from natural language descriptions of knee pain, navigates a JSON decision tree, and returns recommended physical therapy exercises.
+A production-grade Node.js (ESM) backend that utilizes Google Gemini AI to transform natural language patient descriptions into structured clinical data. This data drives a dynamic Decision Tree to provide deterministic, therapeutic exercise recommendations.
 
-## Structure
-- `src/controllers/`: Handle requests and responses.
-- `src/services/`: Contain business logic (traversal).
-- `src/routes/`: Route definitions.
-- `src/middleware/`: LLM data extraction logic.
-- `src/utils/`: Common helpers (logger, validator).
-- `src/data/`: Data files (tree and catalog).
+---
 
-## API Endpoints
-- `POST /api/diagnose`: Triage knee pain from a natural language prompt.
-- `GET /health`: Health check.
+## 🚀 Project Instructions
 
+### 1. Prerequisites
+- **Node.js**: v20 or higher recommended.
+- **Google Gemini API Key**: Obtain from [Google AI Studio](https://aistudio.google.com/).
 
-## Installation
+### 2. Setup
+Clone the repository and install dependencies:
+```bash
+npm install
+```
 
-1. Install dependencies:
-   ```bash
-   npm install
-   ```
+### 3. Environment Configuration
+Create a `.env` file in the root directory:
+```env
+GEMINI_API_KEY=your_google_ai_studio_api_key_here
+```
 
-2. Run the server:
-   ```bash
-   npm start
-   ```
+### 4. Running the Project
+Start the production server:
+```bash
+npm start
+```
+*The server will run on `http://localhost:3000` by default.*
 
-3. Run the tests:
-   ```bash
-   npm test
-   ```
+### 5. Running Tests
+The project includes a comprehensive Jest test suite using ESM-native mocking:
+```bash
+npm test
+```
 
-## Features
+---
 
-### Extensibility (Wildcard Branches)
-The decision tree supports a `*` wildcard branch. If a user provides an attribute value that doesn't match any specific branch, the system will follow the `*` branch if it exists. For example, in `time_of_day`, if the user specifies "evening" but only "morning" and `*` are defined, it will fall back to the `*` branch and return the default exercises (`ex_001` and `ex_004`).
+## 🧠 Design Decisions
 
-### Missing Information Handling
-If the LLM fails to extract a required attribute for the current node in the decision tree, the traversal halts. The API returns a `200 OK` response with a `missing_info` status and prompts the user with a follow-up question (e.g., "Please provide your time_of_day").
+- **Deterministic Decision Logic**: While we use LLMs for extraction, the actual medical triage is handled by a hard-coded JSON Decision Tree. This ensures that the same clinical input always results in the same recommendation, preventing "AI hallucinations" in medical contexts.
+- **Dynamic AI Context**: Instead of hardcoding prompts, the system crawls the `tree.json` at runtime to extract all possible attributes and values. This is injected into the Gemini `responseSchema`, turning the AI into a strict classifier rather than a creative writer.
+- **Stateless Architecture**: The API identifies missing information but does not store session state. This allows for horizontal scaling and shifts the burden of multi-turn conversation state to the frontend client.
 
-### Resolving Ambiguous Prompts & Schema Mismatches
-In a real-world scenario, ambiguous prompts and schema mismatches can be mitigated by:
-- **LLM Enums:** Constraining the LLM to only output specific enum values for attributes (e.g., `pain_location` must be "top of knee", "outside of knee", etc.).
-- **System Prompts:** Providing clear instructions to the LLM on how to classify ambiguous inputs.
-- **Structured JSON Outputs:** Using features like OpenAI's JSON mode or function calling to ensure the output strictly adheres to the expected schema.
+---
+
+## 🛠 Technical Solutions
+
+### 7. Extending the Decision Tree
+**Scenario**: Adding a new factor like `time_of_day` (morning vs night) to influence recovery steps.
+
+**Implementation**:
+- **JSON Modification**: Insert `time_of_day` as a new `attribute` node in `tree.json`.
+- **Backward Compatibility**: Always include a `*` (wildcard) branch under new attributes. If older clients or ambiguous prompts don't provide the time, the system safely falls through to a default exercise set.
+- **Zero-Code LLM Update**: The `llmExtractor` middleware uses `DiagnosisService.getAvailableAttributes()`. As soon as the JSON is updated, the LLM will automatically receive instructions to extract "time_of_day" without any developer modifying the JavaScript code.
+
+### 8. Missing Information Handling
+**Scenario**: A user says *"my knee hurts when I walk upstairs"* but doesn't mention which knee or the type of pain.
+
+**Implementation**:
+- **Proactive Scanning**: When the `traverseTree` utility hits a node where a value is undefined, the `DiagnosisService` doesn't just return the first missing field. It scans the entire decision model to find *all* missing required fields.
+- **Response Format**: The API returns a `200 OK` with a `missing_info` status. It provides an array of `follow_up_questions` (e.g., `["Please provide your pain_side", "Please provide your pain_description"]`), allowing the user to provide all missing context in one go.
+
+### 9. Ambiguous Prompt Resolution
+**Scenario**: A user says *"it hurts when I go up stairs"*, which needs to map to the tree's `"walking upstairs"` key.
+
+**Implementation**:
+- **Schema Mapping**: We move away from open-ended extraction and use **Classificaiton**.
+- **Enum Enforcement**: We pass the exact keys from `tree.json` (e.g., `"walking upstairs"`, `"after running"`) into the Gemini `responseSchema` as an Enum list. 
+- **Mapping Logic**: The system prompt instructs the AI to map synonyms (e.g., "climbing steps", "up the stairs") to the *closest* matching allowed Enum value defined in our clinical tree.
+
+### 10. Schema Mismatch & Normalization
+**Scenario**: LLM outputs `"jogging"` but the tree expects `"running"`.
+
+**Implementation**:
+- **Strict Constraint Injection**: By defining a custom `responseSchema` in the Google Generative AI SDK, the model is physically constrained to return only the values present in our tree. It essentially "sanitizes" the user's input before it hits the application logic.
+- **Middleware Sanitization**: For high-robustness scenarios, we recommend a post-LLM normalization layer using `string-similarity` (Levenshtein distance). This validates the LLM's output against the tree's keys one last time to fix minor tense or casing mismatches (e.g., `"click"` vs `"clicking"`) before final traversal.
+
+---
+
+## 📂 Folder Structure
+- `src/controllers/`: API request/response orchestration.
+- `src/services/`: Core logic for tree initialization and data extraction.
+- `src/middleware/`: Gemini AI integration and schema enforcement.
+- `src/utils/`: Deterministic tree traversal and validation logic.
+- `src/data/`: `tree.json` (Clinical paths) and `catalog.json` (Exercise data).

@@ -1,6 +1,124 @@
 {
-  "ex_001": { "name": "Quad Stretch", "reps": 10 },
-  "ex_002": { "name": "IT Band Stretch", "reps": 5 },
-  "ex_003": { "name": "Step-ups", "reps": 15 },
-  "ex_004": { "name": "Hamstring Curls", "reps": 12 }
+  "ex_001": {
+    "name": "Quad Stretch",
+    "reps": 10,
+    "sets": 3,
+    "frequency": "Daily"
+  },
+  "ex_002": {
+    "name": "IT Band Stretch",
+    "reps": 5,
+    "sets": 2,
+    "frequency": "Daily"
+  },
+  "ex_003": {
+    "name": "Step-ups",
+    "reps": 15,
+    "sets": 3,
+    "frequency": "3x a week"
+  },
+  "ex_004": {
+    "name": "Hamstring Curls",
+    "reps": 12,
+    "sets": 3,
+    "frequency": "3x a week"
+  },
+  "ex_005": {
+    "name": "Wall Sits",
+    "reps": 3,
+    "sets": 3,
+    "frequency": "Every other day",
+    "duration_sec": 30
+  },
+  "ex_006": {
+    "name": "Calf Raises",
+    "reps": 20,
+    "sets": 3,
+    "frequency": "3x a week"
+  },
+  "ex_007": {
+    "name": "Clamshells",
+    "reps": 15,
+    "sets": 3,
+    "frequency": "Daily"
+  },
+  "ex_008": {
+    "name": "Straight Leg Raises",
+    "reps": 15,
+    "sets": 3,
+    "frequency": "Daily"
+  },
+  "ex_009": {
+    "name": "Glute Bridges",
+    "reps": 12,
+    "sets": 3,
+    "frequency": "3x a week"
+  },
+  "ex_010": {
+    "name": "Foam Rolling IT Band",
+    "reps": 10,
+    "sets": 1,
+    "frequency": "Daily"
+  },
+  "ex_011": {
+    "name": "Heel Slides",
+    "reps": 15,
+    "sets": 2,
+    "frequency": "Daily (Post-op focus)"
+  },
+  "ex_012": {
+    "name": "Short Arc Quads",
+    "reps": 10,
+    "sets": 3,
+    "frequency": "Daily"
+  },
+  "ex_013": {
+    "name": "Long Arc Quads",
+    "reps": 10,
+    "sets": 3,
+    "frequency": "3x a week"
+  },
+  "ex_014": {
+    "name": "Mini Squats",
+    "reps": 12,
+    "sets": 3,
+    "frequency": "Every other day"
+  },
+  "ex_015": {
+    "name": "Lateral Band Walks",
+    "reps": 15,
+    "sets": 2,
+    "frequency": "3x a week"
+  },
+  "ex_016": {
+    "name": "Monster Walks",
+    "reps": 15,
+    "sets": 2,
+    "frequency": "3x a week"
+  },
+  "ex_017": {
+    "name": "Standing Hip Abductions",
+    "reps": 12,
+    "sets": 3,
+    "frequency": "Daily"
+  },
+  "ex_018": {
+    "name": "Side Lying Hip Adductions",
+    "reps": 15,
+    "sets": 2,
+    "frequency": "Every other day"
+  },
+  "ex_019": {
+    "name": "Single Leg Stance Balance",
+    "reps": 3,
+    "sets": 1,
+    "frequency": "Daily",
+    "duration_sec": 60
+  },
+  "ex_020": {
+    "name": "Static Lunges",
+    "reps": 10,
+    "sets": 3,
+    "frequency": "Every other day"
+  }
 }

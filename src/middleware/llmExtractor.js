@@ -1,6 +1,7 @@
 import 'dotenv/config';
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import { GoogleGenerativeAI, SchemaType } from '@google/generative-ai';
 import logger from '../utils/logger.js';
+import diagnosisService from '../services/diagnosis.service.js';
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
@@ -14,23 +15,52 @@ export default async function llmExtractor(req, res, next) {
 
     try {
         const timeoutMs = 15000;
+
+        // Fetch dynamic attributes from the Decision Tree
+        const availableAttributes = diagnosisService.getAvailableAttributes();
+
+        // Build schema and explicit prompt rules dynamically
+        const schemaProperties = {};
+        let rulesText = "";
+
+        for (const [attr, options] of Object.entries(availableAttributes)) {
+            const joinedOptions = options.map(o => `'${o}'`).join(', ');
+            schemaProperties[attr] = {
+                type: SchemaType.STRING,
+                description: `Extract the '${attr}'. MUST be one of: [${joinedOptions}]. Omit if missing.`
+            };
+            rulesText += `- ${attr}: [${joinedOptions}]\n`;
+        }
+
+        const responseSchema = {
+            type: SchemaType.OBJECT,
+            properties: schemaProperties
+        };
+
         const model = genAI.getGenerativeModel({
             model: "gemini-2.5-flash",
-            generationConfig: { responseMimeType: "application/json" }
+            generationConfig: {
+                responseMimeType: "application/json",
+                responseSchema: responseSchema,
+                temperature: 0.1
+            }
         });
 
         const systemPrompt = `
-Extract structured clinical data from the following user description of knee pain.
-User input: "${promptText}"
+You are an expert clinical data extractor for a knee pain triage system. Process the user's description and extract ALL relevant clinical attributes based on the allowed values below.
 
-RULES:
-1. Return a JSON object only. Do not include markdown or explanations.
-2. If an attribute is not mentioned, do not include its key in the JSON.
-3. Map the findings to these exact allowed values ONLY:
-   - "activity_trigger": ["after running", "walking upstairs", "jumping"]
-   - "pain_location": ["top of knee", "outside of knee"]
-   - "time_of_day": ["morning", "evening"]
-        `;
+USER INPUT: "${promptText}"
+
+STRICT EXTRACTION RULES:
+1. Examine the user's input for every attribute listed under "ALLOWED VALUES".
+2. If the user mentions a trait that matches an allowed value (e.g., "aching sharply" matches pain_description: sharp), extract it.
+3. RETURN ONLY A JSON OBJECT.
+4. If an attribute name is not explicitly mentioned but its description is (e.g., "hurts when I run" maps to activity_trigger: after running), map it to the correct allowed value.
+5. IMPORTANT: If the user provides a value that is NOT in the allowed list but CLEARLY describes that attribute (e.g., "crawling" is an activity), map that attribute to 'other'.
+
+ALLOWED VALUES FOR EXTRACTION:
+${rulesText}
+`;
 
         // Wait for the Gemini API call or throw an error after 15 seconds.
         const result = await Promise.race([

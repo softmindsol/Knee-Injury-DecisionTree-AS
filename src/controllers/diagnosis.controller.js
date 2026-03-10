@@ -9,7 +9,12 @@ export const handleDiagnosis = (req, res) => {
     } else if (result.status === 'missing_info') {
         return res.status(200).json({
             message: "More info needed",
-            follow_up_questions: [`Please provide your ${result.missingAttribute}`]
+            follow_up_questions: result.missingAttributes.map(attr => `Please provide your ${attr}`)
+        });
+    } else if (result.status === 'suggestion') {
+        return res.status(200).json({
+            message: result.message,
+            recommended_exercises: result.recommended_exercises
         });
     } else if (result.status === 'no_match') {
         return res.status(404).json({ error: "No matching diagnosis found" });

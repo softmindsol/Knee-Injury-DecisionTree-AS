@@ -1,0 +1,38 @@
+[
+    {
+        "scenario": "Full match (Running + Top + Left + Sharp)",
+        "prompt": "Ever since I started running last week, I get this sharp pain right on the top of my left knee."
+    },
+    {
+        "scenario": "Stairs match (Aching + Right)",
+        "prompt": "My right knee has a dull ache whenever I walk upstairs."
+    },
+    {
+        "scenario": "Squat match (Clicking + Both)",
+        "prompt": "Both my knees are clicking when I do deep squats at the gym."
+    },
+    {
+        "scenario": "Jumping match (Location match + Side match)",
+        "prompt": "I landed a jump poorly and now the outside of my right knee feels stiff."
+    },
+    {
+        "scenario": "Unmapped Activity (Crawling - triggers 'other' logic)",
+        "prompt": "My knees hurt when I'm crawling on the floor with my kids."
+    },
+    {
+        "scenario": "Partial info (Trigger only)",
+        "prompt": "My left knee hurts when I sit for a long time."
+    },
+    {
+        "scenario": "Vague Description (Test for fallback)",
+        "prompt": "I have some weird discomfort below the kneecap on both sides."
+    },
+    {
+        "scenario": "Soccer injury (Twisting + Outside)",
+        "prompt": "I was playing soccer and twisted my knee; now it hurts on the outside when I run."
+    },
+    {
+        "scenario": "Staged recovery (Stiffness focus)",
+        "prompt": "I'm feeling a lot of stiffness in my left knee when I wake up and walk upstairs."
+    }
+]
