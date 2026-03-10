@@ -1,0 +1,34 @@
+{
+  "id": "node_root",
+  "attribute": "activity_trigger",
+  "branches": {
+    "after running": {
+      "id": "node_after_running",
+      "attribute": "pain_location",
+      "branches": {
+        "top of knee": {
+          "id": "node_top_of_knee",
+          "attribute": "time_of_day",
+          "branches": {
+            "morning": {
+              "id": "node_morning",
+              "exercises": ["ex_001"]
+            },
+            "*": {
+              "id": "node_wildcard",
+              "exercises": ["ex_001", "ex_004"]
+            }
+          }
+        },
+        "outside of knee": {
+          "id": "node_outside_of_knee",
+          "exercises": ["ex_002"]
+        }
+      }
+    },
+    "walking upstairs": {
+      "id": "node_walking_upstairs",
+      "exercises": ["ex_003"]
+    }
+  }
+}
