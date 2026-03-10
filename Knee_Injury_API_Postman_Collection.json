@@ -1,0 +1,189 @@
+{
+    "info": {
+        "_postman_id": "a1b2c3d4-e5f6-4g7h-8i9j-k0l1m2n3o4p5",
+        "name": "Knee Injury Triage API",
+        "description": "Postman collection for testing the Knee Pain Triage System API.",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+        {
+            "name": "Health Check",
+            "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                    "raw": "{{base_url}}/health",
+                    "host": [
+                        "{{base_url}}"
+                    ],
+                    "path": [
+                        "health"
+                    ]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "Diagnosis - Happy Path (Upstairs)",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n    \"prompt\": \"hurts when I walk upstairs\"\n}"
+                },
+                "url": {
+                    "raw": "{{base_url}}/api/diagnose",
+                    "host": [
+                        "{{base_url}}"
+                    ],
+                    "path": [
+                        "api",
+                        "diagnose"
+                    ]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "Diagnosis - Missing Information",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n    \"prompt\": \"left knee aches after running and top\"\n}"
+                },
+                "url": {
+                    "raw": "{{base_url}}/api/diagnose",
+                    "host": [
+                        "{{base_url}}"
+                    ],
+                    "path": [
+                        "api",
+                        "diagnose"
+                    ]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "Diagnosis - No Match (Unknown Trigger)",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n    \"prompt\": \"unknown trigger\"\n}"
+                },
+                "url": {
+                    "raw": "{{base_url}}/api/diagnose",
+                    "host": [
+                        "{{base_url}}"
+                    ],
+                    "path": [
+                        "api",
+                        "diagnose"
+                    ]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "Diagnosis - LLM Timeout (Error Case)",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n    \"prompt\": \"timeout\"\n}"
+                },
+                "url": {
+                    "raw": "{{base_url}}/api/diagnose",
+                    "host": [
+                        "{{base_url}}"
+                    ],
+                    "path": [
+                        "api",
+                        "diagnose"
+                    ]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "Diagnosis - LLM Bad Format (Error Case)",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n    \"prompt\": \"bad format\"\n}"
+                },
+                "url": {
+                    "raw": "{{base_url}}/api/diagnose",
+                    "host": [
+                        "{{base_url}}"
+                    ],
+                    "path": [
+                        "api",
+                        "diagnose"
+                    ]
+                }
+            },
+            "response": []
+        }
+    ],
+    "event": [
+        {
+            "listen": "prerequest",
+            "script": {
+                "type": "text/javascript",
+                "exec": [
+                    ""
+                ]
+            }
+        },
+        {
+            "listen": "test",
+            "script": {
+                "type": "text/javascript",
+                "exec": [
+                    ""
+                ]
+            }
+        }
+    ],
+    "variable": [
+        {
+            "key": "base_url",
+            "value": "http://localhost:3000",
+            "type": "string"
+        }
+    ]
+}

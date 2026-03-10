@@ -1,0 +1,122 @@
+
+> knee-injury-api@1.0.0 test
+> cross-env NODE_OPTIONS=--experimental-vm-modules jest
+
+  console.log
+    {"timestamp":"2026-03-10T09:54:27.997Z","level":"INFO","context":"DiagnosisService","message":"Decision tree and catalog loaded and validated","data":{}}
+
+      at Logger.log (src/utils/logger.js:10:17)
+
+npm : (node:13832) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+At line:1 char:1
++ npm test 2>&1 | Out-String -Width 4096 | Set-Content test-logs.txt
++ ~~~~~~~~~~~~~
+    + CategoryInfo              : NotSpecified: ((node:1    3832) Ex...nge at any ti    me:String) [], RemoteExc    eption
+    + FullyQualifiedErrorId     : NativeCommandError
+ 
+(Use `node --trace-warnings ...` to show where the warning was created)
+  console.log
+    {"timestamp":"2026-03-10T09:54:30.585Z","level":"ERROR","context":"llmExtractor","message":"Gemini API failure","data":{"error":"[GoogleGenerativeAI Error]: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent: [400 Bad Request] API key not valid. Please pass a valid API key. [{\"@type\":\"type.googleapis.com/google.rpc.ErrorInfo\",\"reason\":\"API_KEY_INVALID\",\"domain\":\"googleapis.com\",\"metadata\":{\"service\":\"generativelanguage.googleapis.com\"}},{\"@type\":\"type.googleapis.com/google.rpc.LocalizedMessage\",\"locale\":\"en-US\",\"message\":\"API key not valid. Please pass a valid API key.\"}]","prompt":"hurts when I walk upstairs"}}
+
+      at Logger.log (src/utils/logger.js:10:17)
+
+  console.log
+    {"timestamp":"2026-03-10T09:54:30.588Z","level":"INFO","context":"traverseTree","message":"Branch selected","data":{"attribute":"activity_trigger","value":"walking upstairs"}}
+
+      at Logger.log (src/utils/logger.js:10:17)
+
+  console.log
+    {"timestamp":"2026-03-10T09:54:30.594Z","level":"INFO","context":"traverseTree","message":"Leaf node reached","data":{"exercises":["ex_003"]}}
+
+      at Logger.log (src/utils/logger.js:10:17)
+
+  console.log
+    {"timestamp":"2026-03-10T09:54:31.147Z","level":"ERROR","context":"llmExtractor","message":"Gemini API failure","data":{"error":"[GoogleGenerativeAI Error]: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent: [400 Bad Request] API key not valid. Please pass a valid API key. [{\"@type\":\"type.googleapis.com/google.rpc.ErrorInfo\",\"reason\":\"API_KEY_INVALID\",\"domain\":\"googleapis.com\",\"metadata\":{\"service\":\"generativelanguage.googleapis.com\"}},{\"@type\":\"type.googleapis.com/google.rpc.LocalizedMessage\",\"locale\":\"en-US\",\"message\":\"API key not valid. Please pass a valid API key.\"}]","prompt":"left knee aches after running and top"}}
+
+      at Logger.log (src/utils/logger.js:10:17)
+
+  console.log
+    {"timestamp":"2026-03-10T09:54:31.325Z","level":"ERROR","context":"llmExtractor","message":"Gemini API failure","data":{"error":"[GoogleGenerativeAI Error]: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent: [400 Bad Request] API key not valid. Please pass a valid API key. [{\"@type\":\"type.googleapis.com/google.rpc.ErrorInfo\",\"reason\":\"API_KEY_INVALID\",\"domain\":\"googleapis.com\",\"metadata\":{\"service\":\"generativelanguage.googleapis.com\"}},{\"@type\":\"type.googleapis.com/google.rpc.LocalizedMessage\",\"locale\":\"en-US\",\"message\":\"API key not valid. Please pass a valid API key.\"}]","prompt":"unknown trigger"}}
+
+      at Logger.log (src/utils/logger.js:10:17)
+
+  console.log
+    {"timestamp":"2026-03-10T09:54:31.337Z","level":"ERROR","context":"llmExtractor","message":"Simulated LLM API timeout","data":{}}
+
+      at Logger.log (src/utils/logger.js:10:17)
+
+  console.log
+    {"timestamp":"2026-03-10T09:54:31.881Z","level":"ERROR","context":"llmExtractor","message":"Gemini API failure","data":{"error":"[GoogleGenerativeAI Error]: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent: [400 Bad Request] API key not valid. Please pass a valid API key. [{\"@type\":\"type.googleapis.com/google.rpc.ErrorInfo\",\"reason\":\"API_KEY_INVALID\",\"domain\":\"googleapis.com\",\"metadata\":{\"service\":\"generativelanguage.googleapis.com\"}},{\"@type\":\"type.googleapis.com/google.rpc.LocalizedMessage\",\"locale\":\"en-US\",\"message\":\"API key not valid. Please pass a valid API key.\"}]","prompt":"bad format"}}
+
+      at Logger.log (src/utils/logger.js:10:17)
+
+FAIL tests/triage.test.js
+  Knee Pain Triage System
+    POST /api/diagnose
+      GêÜ should return correct exercises for valid input (Happy Path) (2571 ms)
+      +ù should return a follow-up question when information is missing (542 ms)
+      +ù should return a 404 error for unknown input / unmapped branch (173 ms)
+      GêÜ should return 503 on API Timeout (14 ms)
+      +ù should return 500 on Bad JSON format from LLM (540 ms)
+    Tree Validation
+      GêÜ should throw an error on a dead end (7 ms)
+      GêÜ should throw an error on a missing catalog ID (2 ms)
+      GêÜ should throw an error on circular reference (2 ms)
+
+  GùÅ Knee Pain Triage System GÇ¦ POST /api/diagnose GÇ¦ should return a follow-up question when information is missing
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 200
+    Received: 500
+
+    [0m [90m 20 |[39m         [33m.[39msend({ prompt[33m:[39m [32m"left knee aches after running and top"[39m })[33m;[39m
+     [90m 21 |[39m
+    [31m[1m>[22m[39m[90m 22 |[39m       expect(res[33m.[39mstatus)[33m.[39mtoBe([35m200[39m)[33m;[39m
+     [90m    |[39m                          [31m[1m^[22m[39m
+     [90m 23 |[39m       expect(res[33m.[39mbody)[33m.[39mtoHaveProperty([32m'message'[39m[33m,[39m [32m'More info needed'[39m)[33m;[39m
+     [90m 24 |[39m       expect(res[33m.[39mbody[33m.[39mfollow_up_questions[[35m0[39m])[33m.[39mtoContain([32m'time_of_day'[39m)[33m;[39m
+     [90m 25 |[39m     })[33m;[39m[0m
+
+      at Object.toBe (tests/triage.test.js:22:26)
+
+  GùÅ Knee Pain Triage System GÇ¦ POST /api/diagnose GÇ¦ should return a 404 error for unknown input / unmapped branch
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 404
+    Received: 500
+
+    [0m [90m 30 |[39m         [33m.[39msend({ prompt[33m:[39m [32m"unknown trigger"[39m })[33m;[39m
+     [90m 31 |[39m
+    [31m[1m>[22m[39m[90m 32 |[39m       expect(res[33m.[39mstatus)[33m.[39mtoBe([35m404[39m)[33m;[39m
+     [90m    |[39m                          [31m[1m^[22m[39m
+     [90m 33 |[39m       expect(res[33m.[39mbody[33m.[39merror)[33m.[39mtoBe([32m'No matching diagnosis found'[39m)[33m;[39m
+     [90m 34 |[39m     })[33m;[39m
+     [90m 35 |[39m[0m
+
+      at Object.toBe (tests/triage.test.js:32:26)
+
+  GùÅ Knee Pain Triage System GÇ¦ POST /api/diagnose GÇ¦ should return 500 on Bad JSON format from LLM
+
+    expect(received).toContain(expected) // indexOf
+
+    Expected substring: "Failed to parse"
+    Received string:    "Intelligence Engine Error: Failed to process natural language input."
+
+    [0m [90m 49 |[39m
+     [90m 50 |[39m       expect(res[33m.[39mstatus)[33m.[39mtoBe([35m500[39m)[33m;[39m
+    [31m[1m>[22m[39m[90m 51 |[39m       expect(res[33m.[39mbody[33m.[39merror)[33m.[39mtoContain([32m'Failed to parse'[39m)[33m;[39m
+     [90m    |[39m                              [31m[1m^[22m[39m
+     [90m 52 |[39m     })[33m;[39m
+     [90m 53 |[39m   })[33m;[39m
+     [90m 54 |[39m[0m
+
+      at Object.toContain (tests/triage.test.js:51:30)
+
+Test Suites: 1 failed, 1 total
+Tests:       3 failed, 5 passed, 8 total
+Snapshots:   0 total
+Time:        4.72 s, estimated 6 s
+Ran all test suites.
+

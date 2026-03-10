@@ -1,6 +1,19 @@
-# Knee Pain Triage System
+# Knee Pain Triage API
 
-A production-ready Express.js API that uses a (mocked) LLM to extract structured data from natural language descriptions of knee pain, navigates a JSON decision tree, and returns recommended physical therapy exercises.
+A production-ready Express.js API (ESM) that uses a (mocked) LLM to extract structured data from natural language descriptions of knee pain, navigates a JSON decision tree, and returns recommended physical therapy exercises.
+
+## Structure
+- `src/controllers/`: Handle requests and responses.
+- `src/services/`: Contain business logic (traversal).
+- `src/routes/`: Route definitions.
+- `src/middleware/`: LLM data extraction logic.
+- `src/utils/`: Common helpers (logger, validator).
+- `src/data/`: Data files (tree and catalog).
+
+## API Endpoints
+- `POST /api/diagnose`: Triage knee pain from a natural language prompt.
+- `GET /health`: Health check.
+
 
 ## Installation
 
